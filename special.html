@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Story For Someone Special</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;500;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Keyframe Animations --- */
+        @keyframes gradient-animation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.9) translateY(-20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes title-glow { 0%, 100% { text-shadow: 2px 2px 10px rgba(236, 72, 153, 0.2), 0 0 10px rgba(253, 164, 175, 0.3); } 50% { text-shadow: 2px 2px 20px rgba(236, 72, 153, 0.5), 0 0 20px rgba(253, 164, 175, 0.5); } }
+        @keyframes float-element {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.8; }
+            50% { transform: translateY(-10px) rotate(5deg); opacity: 1; }
+            100% { transform: translateY(0px) rotate(0deg); opacity: 0.8; }
+        }
+        @keyframes reveal-story { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes reveal-surprise { from { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; } to { max-height: 500px; opacity: 1; padding-top: 1.5rem; padding-bottom: 1.5rem; } }
+
+        /* --- NEW ANIMATIONS --- */
+        @keyframes gentle-pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.4); }
+            70% { transform: scale(1.03); box-shadow: 0 0 0 8px rgba(244, 114, 182, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 114, 182, 0); }
+        }
+        @keyframes heart-pulse {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.05); }
+        }
+        @keyframes text-glow-fade-in {
+            from { 
+                opacity: 0; 
+                text-shadow: 2px 2px 20px rgba(236, 72, 153, 0.0), 0 0 20px rgba(253, 164, 175, 0.0);
+                transform: translateY(-10px);
+            }
+            to { 
+                opacity: 1; 
+                text-shadow: 2px 2px 10px rgba(236, 72, 153, 0.2), 0 0 10px rgba(253, 164, 175, 0.3);
+                transform: translateY(0);
+            }
+        }
+        @keyframes fade-in-text-content {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* NEW: Falling heart animation */
+        @keyframes fall-heart {
+            0% { 
+                transform: translateY(-10vh) translateX(0) rotate(0deg) scale(0); 
+                opacity: 0;
+            }
+            10% { 
+                opacity: 1; 
+                transform: translateY(0) translateX(0) rotate(0deg) scale(1); 
+            }
+            80% { 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(110vh) translateX(var(--sway-x)) rotate(var(--sway-rotate)) scale(var(--final-scale)); 
+                opacity: 0;
+            }
+        }
+
+        /* --- Base & Body Styling --- */
+        body {
+            background: linear-gradient(-45deg, #fbcfe8, #fecdd3, #ddd6fe, #f9a8d4);
+            background-size: 400% 400%;
+            animation: gradient-animation 18s ease infinite;
+            font-family: 'Inter', sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 1rem; color: #4b5563; overflow: hidden;
+            position: relative;
+        }
+        .font-pacifico { font-family: 'Pacifico', cursive; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        
+        /* --- Interactive Background Elements (Floating shapes) --- */
+        .floating-element {
+            position: absolute; pointer-events: none; opacity: 0;
+            animation: fadeIn 1s forwards, float-element 8s ease-in-out infinite;
+        }
+        .floating-heart { font-size: 30px; color: #fecdd3; }
+        .floating-star { font-size: 25px; color: #fff1f2; }
+        .floating-sparkle { font-size: 20px; color: #fff; }
+
+        /* NEW: Styles for falling hearts */
+        .falling-heart {
+            position: absolute;
+            top: -10%; /* Start above the viewport */
+            font-size: clamp(1rem, 2vw + 1rem, 3rem); /* Responsive size */
+            opacity: 0;
+            pointer-events: none;
+            animation: fall-heart var(--animation-duration) linear forwards;
+            z-index: 0; /* Ensure hearts are behind content but visible */
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+        }
+
+        /* --- Intro Story Overlay --- */
+        #intro-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100; opacity: 0; animation: fadeIn 1s forwards;
+            flex-direction: column;
+        }
+        .intro-card {
+            background: white; padding: 2.5rem; border-radius: 1.5rem; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-width: 500px; width: 90%;
+            animation: fadeInScale 0.8s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; opacity: 0;
+            position: relative; overflow: hidden;
+            z-index: 10; /* Ensure intro card is above falling hearts */
+        }
+        .intro-card h1 {
+            opacity: 0;
+            animation: text-glow-fade-in 1.2s 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .intro-card::before {
+            content: ''; position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px;
+            background: radial-gradient(circle, #fbcfe8 0%, transparent 70%);
+            opacity: 0.3; z-index: -1;
+        }
+        .story-text {
+            font-family: 'Playfair Display', serif; font-size: 1.2rem; line-height: 1.6;
+            color: #555; margin-bottom: 1.5rem; opacity: 0;
+            animation: reveal-story 1.5s 1.5s ease-out forwards;
+        }
+        .intro-start-button {
+            background-color: #f472b6; color: white; padding: 0.8rem 2.5rem; border-radius: 9999px;
+            font-weight: bold; border: none; cursor: pointer; transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2);
+            opacity: 0; animation: fadeInUp 0.8s 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            z-index: 10; /* Ensure button is above hearts */
+        }
+        .intro-start-button:hover { background-color: #ec4899; transform: scale(1.05); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3); }
+
+        /* --- Main Content Container --- */
+        .main-container {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px);
+            border-radius: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); padding: 2rem; max-width: 700px;
+            width: 100%; max-height: 90vh; display: flex; flex-direction: column; visibility: hidden;
+            z-index: 10; /* Ensure main content is above falling hearts */
+        }
+        .main-container.visible { visibility: visible; animation: fadeInScale 0.8s 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; opacity: 0; }
+
+        .header-title { animation: title-glow 4s ease-in-out infinite; }
+        
+        .reasons-container {
+            flex-grow: 1; overflow-y: auto; padding-right: 1rem;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .reasons-container::-webkit-scrollbar { 
+            width: 8px;
+        }
+        .reasons-container::-webkit-scrollbar-track {
+            background: #fde4e4;
+            border-radius: 10px;
+        }
+        .reasons-container::-webkit-scrollbar-thumb {
+            background: #fda4af;
+            border-radius: 10px;
+        }
+
+        .reason-item {
+            background: rgba(255, 255, 255, 0.95); padding: 0.75rem 1rem 0.75rem 3.5rem;
+            margin-bottom: 0.75rem; border-radius: 0.75rem; border-left: 6px solid #f472b6;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative; font-weight: 500; opacity: 0; animation: fadeInUp 0.5s ease-out forwards; cursor: pointer;
+        }
+        .reason-item:nth-child(even) { border-left-color: #fb7185; }
+        .reason-item:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); }
+        
+        .reason-item::before {
+            content: ''; position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); width: 24px; height: 24px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23f472b6"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
+            background-repeat: no-repeat; background-size: contain; transition: transform 0.3s ease;
+            animation: heart-pulse 2s infinite ease-in-out 1s; 
+        }
+        .reason-item:hover::before { 
+            transform: translateY(-50%) scale(1.1); 
+            animation-play-state: paused; 
+        }
+        .reason-item:nth-child(even)::before { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23fb7185"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'); }
+        
+        #surprise-container { text-align: center; margin-top: 1.5rem; opacity: 0; }
+        
+        .reveal-surprise-container {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        #surprise-button {
+            background: transparent; border: 2px solid #f472b6; color: #f472b6; font-weight: bold;
+            padding: 0.6rem 1.5rem; border-radius: 999px; cursor: pointer; transition: all 0.3s ease;
+            animation: gentle-pulse 2s infinite 1.5s; 
+        }
+        #surprise-button:hover { 
+            background: #fdf2f8; 
+            transform: scale(1.05); 
+            animation-play-state: paused;
+        }
+        #surprise-message {
+            overflow: hidden; max-height: 0; opacity: 0;
+            transition: max-height 0.8s ease-out, opacity 0.8s ease-out, padding 0.8s ease-out;
+            background: #fdf2f8; border-radius: 1rem; margin-top: 1rem; color: #be185d;
+        }
+        #surprise-message.revealed { animation: reveal-surprise 0.8s ease-out forwards; }
+        
+        .reveal-text {
+            opacity: 0;
+            animation: fade-in-text-content 0.8s 0.5s ease-out forwards; 
+        }
+
+        #toast-notification {
+            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(200%);
+            background-color: #374151; color: white; padding: 0.75rem 1.5rem; border-radius: 9999px;
+            font-weight: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.25); z-index: 200;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        #toast-notification.show { transform: translateX(-50%) translateY(0); }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            color: #c11010; 
+            background-color: rgba(255, 255, 255, 0.2); 
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500; 
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3); 
+            pointer-events: all;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+        }
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 
+      REMINDER: The 'src' attribute must be a valid, public web link (URL) to an audio file.
+      Local file paths like "Chal Diye Tum Kahan Pe..." will not work when the file is
+      hosted online or viewed by someone else.
+      Please replace it with a public URL, for example: "https://example.com/audio/my-song.mp3"
+    --><audio id="surprise-song" src="Chal Diye Tum Kahan Pe Song Download Pagalworld Mp3.mp3" preload="auto"></audio>
+    
+    <!-- Floating background elements (your original static ones) --><div class="floating-element floating-heart" style="top: 10%; left: 15%; animation-delay: 0s;"></div>
+    <div class="floating-element floating-star" style="top: 25%; left: 80%; animation-delay: 2s;"></div>
+    <div class="floating-element floating-sparkle" style="top: 50%; left: 10%; animation-delay: 4s;"></div>
+    <div class="floating-element floating-heart" style="top: 70%; left: 40%; animation-delay: 6s;"></div>
+    <div class="floating-element floating-star" style="top: 85%; left: 70%; animation-delay: 8s;"></div>
+    <div class="floating-element floating-sparkle" style="top: 5%; left: 50%; animation-delay: 1s;"></div>
+    <div class="floating-element floating-heart" style="top: 30%; left: 5%; animation-delay: 3s;"></div>
+    <div class="floating-element floating-star" style="top: 60%; left: 90%; animation-delay: 5s;"></div>
+    <div class="floating-element floating-sparkle" style="top: 80%; left: 20%; animation-delay: 7s;"></div>
+
+    <!-- Intro Story Overlay --><div id="intro-overlay">
+        <div class="intro-card">
+            <h1 class="font-pacifico text-3xl md:text-4xl text-rose-500 mb-4">An Enchanting Tale</h1>
+            <p class="story-text text-gray-700">
+                In a realm where stars whisper secrets and flowers bloom with forgotten dreams,
+                there exists a unique light, a warmth that touches every soul it encounters.
+                This tale is woven for that very light, to reveal the many reasons why it shines so brightly.
+                Prepare to uncover the magic within...
+            </p>
+            <button id="start-button" class="intro-start-button">Begin the Revelation</button>
+        </div>
+    </div>
+
+    <!-- Back button --><a href="Main.html" class="back-btn">← Back</a>
+
+    <!-- Main Content --><div class="main-container" id="main-container">
+        <h2 class="header-title font-pacifico text-4xl md:text-5xl mb-6 text-center text-rose-500" id="special-title">Reasons Why You Are Special</h2>
+        <div class="reasons-container text-base md:text-lg text-left" id="reasons-container">
+            <!-- Reasons will be populated by JS --></div>
+        <!-- Final surprise will be added here by JS --></div>
+    
+    <!-- Toast Notification --><div id="toast-notification">Copied to clipboard!</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const reasons = ["Because your smile is like sunrise after a long, dark night.", "Because your eyes express what words never can.", "Because you make people feel comfortable around you.", "Because you have a calm energy that’s rare.", "Because you are special because you bring the world at peace.", "Because you’re kind without showing off about it.", "Because you listen when others talk.", "Because your laughter sounds like music.", "Because your gentleness transforms the people around you.", "Because you give simple days a special touch.", "Because you treat everyone with respect.", "Because you never pretend.", "Because you laugh from your heart.", "Because you notice details others miss.", "Because you stay real, not fake.", "Because your sincerity is hard to find and lovely.", "Because you have a vibe that feels safe.", "Because you don’t try to impress , you just do.", "Because you’re confident without arrogance.", "Because you have goals and you chase them.", "Even your flaws make you perfect.", "Because you stay grounded, no matter what.", "Because you bring good energy wherever you go.", "Because you light up every dark moment.", "Because you’re strong but soft-hearted.", "Because you don’t need validation to know your worth.", "Because you stay true to yourself.", "Because you don't pretend to be someone else.", "Because your voice makes everything better.", "Because you have the kind heart.", "Because you make effort without showing it off.", "Because you have genuine kindness in your voice", "Because you’re patient when others lose control.", "Because you’re polite, even when people aren’t.", "Because your goals are important to you.", "Because you give simple things more meaning.", "Because you value people’s emotions.", "Because you don’t gossip — that’s rare.", "Because you handle things maturely.", "Because you never pretend to feel anything.", "Because you make even silence feel peaceful.", "Because your eyes hold entire universes.", "Because you see beauty in small doses.", "Because you're magic, disguised as human.", "Because you’re understanding without needing details.", "Because you care without expectation.", "Because you stay humble.", "Because you have an effortless charm.", "Because you make people smile without trying.", "Because you stand up for what’s right.", "Because you transform fear into peace.", "Because you look beautiful just being natural.", "Because you're balanced calm yet lively.", "Because even your anger is cute.", "Because you handle pressure with grace.", "Because you think before you speak.", "Because you never make others feel small.", "Because you're both tough and fragile.", "Because you remember small details about people.", "Because you make people feel important.", "Because you don’t copy others — you have your own style.", "Because you appreciate little things.", "Because you don’t pretend to be perfect..", "Because you know how to make moments special.", "Because your laugh makes everything lighter.", "Because you bring positivity without forcing it.", "Because you’re gentle but not weak.", "Because you inspire others without knowing it.", "Because your heart is pure gold.", "Because you're the peace in chaos.", "Because you complete every missing piece.", "Because you You value time.", "Because you keep things real.", "Because you’re focused", "Because being with you comforts me.", "Because you don’t hold newges.", "Because you’re emotionally mature.", "Because you bring out the best in people.", "Because you handle things gracefully", "Because you cause time to stand still.", "Because you have a naturally soothing aura.", "Because you help others without expecting anything.", "Because you’re thoughtful.", "Because you make love pure.", "Because being with you is like a blessing.", "Because you don’t follow trends blindly.", "Because you have a voice people like to listen to.", "Because you make pain into lessons.", "Because you balance logic and emotions well.", "Because your smile feels like homecoming.", "Because you’re simple but never ordinary.", "Because every melody begins to make sense after you.", "Because you spread positivity just by being there.", "Because you stay honest, even when it’s hard.", "Because you’re not afraid to be yourself.", "Because you’re good at making others feel understood.", "Because you have a natural elegance.", "Because you’re emotionally intelligent.", "Because you make people feel calm, not tense.", "Because you make even simple moments feel meaningful.", "Because there is nothing better than you"];
+            
+            const introOverlay = document.getElementById('intro-overlay');
+            const startButton = document.getElementById('start-button');
+            const mainContainer = document.getElementById('main-container');
+            const specialTitle = document.getElementById('special-title');
+            const reasonsContainer = document.getElementById('reasons-container');
+            const toast = document.getElementById('toast-notification');
+
+            const heartColors = ['#F472B6', '#FECDD3', '#FBCFE8', '#E879F9', '#DDD6FE', '#A78BFA']; // Various pink, purple, and pastel shades
+            const emojis = ['💖', '✨', '🌸', '💜', '💞']; // You can choose between hearts or emojis
+
+            // --- Function to create falling hearts ---
+            function createFallingElement(elementSymbol, elementColor) {
+                const element = document.createElement('span');
+                element.classList.add('falling-heart'); // Using a general class for falling elements
+                element.textContent = elementSymbol;
+                element.style.color = elementColor; // Apply color dynamically
+
+                // Randomize starting position
+                element.style.left = `${Math.random() * 100}vw`;
+
+                // Randomize animation duration and delay for a natural fall
+                const duration = Math.random() * 10 + 8; // 8-18 seconds
+                const delay = Math.random() * 5; // 0-5 seconds delay
+                
+                // Randomize sway and rotation
+                const swayX = (Math.random() - 0.5) * 50; // -25vw to 25vw sway
+                const swayRotate = (Math.random() - 0.5) * 720; // -360deg to 360deg rotation
+                const finalScale = Math.random() * 0.5 + 0.5; // 0.5 to 1.0 scale
+
+                element.style.setProperty('--animation-duration', `${duration}s`);
+                element.style.setProperty('--sway-x', `${swayX}vw`);
+                element.style.setProperty('--sway-rotate', `${swayRotate}deg`);
+                element.style.setProperty('--final-scale', `${finalScale}`);
+                element.style.animationDelay = `-${delay}s`; // Start some immediately
+
+                document.body.appendChild(element);
+
+                // Remove element after animation to prevent DOM clutter
+                element.addEventListener('animationend', () => {
+                    element.remove();
+                });
+            }
+
+            // --- Generate falling elements continuously ---
+            function startFallingElements() {
+                setInterval(() => {
+                    const randomType = Math.random();
+                    if (randomType < 0.7) { // 70% chance of a heart emoji
+                        const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
+                        createFallingElement('❤️', randomColor);
+                    } else { // 30% chance of a special emoji
+                        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                        const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)]; // Still use colors for emojis
+                        createFallingElement(randomEmoji, randomColor);
+                    }
+                }, 500); // Create a new element every 0.5 seconds
+            }
+
+            startFallingElements(); // Start the falling elements when the page loads
+
+            // --- Intro Story Logic ---
+            startButton.addEventListener('click', () => {
+                introOverlay.style.animation = 'fadeOut 0.5s forwards';
+                setTimeout(() => introOverlay.style.display = 'none', 500);
+                mainContainer.classList.add('visible');
+                populateReasonsAndSurprise();
+
+                // --- Play song on start button click ---
+                const surpriseSong = document.getElementById('surprise-song');
+                const placeholderSrc = "Chal Diye Tum Kahan Pe Song Download Pagalworld Mp3.mp3";
+                const localFileSrc = "Chal Diye Tum Kahan Pe Song Download Pagalworld Mp3.mp3";
+                
+                if (surpriseSong.src && surpriseSong.src !== window.location.href && !surpriseSong.src.endsWith(placeholderSrc) && !surpriseSong.src.endsWith(localFileSrc)) {
+                    surpriseSong.play().catch(e => {
+                        console.error("Audio playback failed. This can happen for many reasons:", e);
+                    });
+                } else if (surpriseSong.src.endsWith(localFileSrc)) {
+                    console.warn("Audio playback may fail: The 'src' attribute is a local file. Please replace it with a public URL for it to work on other devices.");
+                    surpriseSong.play().catch(e => console.error("Local audio playback failed:", e));
+                } else {
+                    console.warn("Could not play audio: The 'src' attribute of the <audio> tag is either empty or still set to the placeholder. Please set it to a valid audio file URL.");
+                }
+            });
+
+            function populateReasonsAndSurprise() {
+                reasons.forEach((reason, index) => {
+                    const reasonEl = document.createElement('div');
+                    reasonEl.className = 'reason-item';
+                    reasonEl.textContent = reason;
+                    reasonEl.style.animationDelay = `${0.8 + index * 0.05}s`; 
+                    reasonsContainer.appendChild(reasonEl);
+                    reasonEl.addEventListener('click', () => {
+                        copyToClipboard(reason);
+                        showToast();
+                    });
+                });
+
+                const surpriseContainer = document.createElement('div');
+                surpriseContainer.id = 'surprise-container';
+                surpriseContainer.classList.add('reveal-surprise-container');
+                surpriseContainer.style.animationDelay = `${0.8 + reasons.length * 0.05}s`;
+                
+                const surpriseButton = document.createElement('button');
+                surpriseButton.id = 'surprise-button';
+                surpriseButton.textContent = 'And one last thing...';
+                
+                const surpriseMessage = document.createElement('div');
+                surpriseMessage.id = 'surprise-message';
+                surpriseMessage.innerHTML = `<p class="font-playfair text-xl md:text-2xl p-6 reveal-text">In a world of ordinary, you are a magical, once-in-a-lifetime kind of wonderful. <br>Never forget that. I will be always there for you</p>`;
+
+                surpriseContainer.appendChild(surpriseButton);
+                surpriseContainer.appendChild(surpriseMessage);
+                mainContainer.appendChild(surpriseContainer);
+
+                surpriseButton.addEventListener('click', () => {
+                    surpriseMessage.classList.toggle('revealed');
+                    surpriseButton.style.display = 'none'; 
+                });
+            }
+            
+            function copyToClipboard(text) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed'; 
+                textArea.style.top = '-9999px';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try { 
+                    document.execCommand('copy'); 
+                } catch (err) { 
+                    console.error('Oops, unable to copy', err); 
+                }
+                document.body.removeChild(textArea);
+            }
+
+            let toastTimeout;
+            function showToast() {
+                clearTimeout(toastTimeout);
+                toast.classList.add('show');
+                toastTimeout = setTimeout(() => toast.classList.remove('show'), 2000);
+            }
+        });
+    </script>
+</body>
+
+</html>
+

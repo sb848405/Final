@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make a Wish</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@300;400&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            background-color: #000;
+            font-family: 'Poppins', sans-serif;
+            cursor: none; /* Hide default cursor for custom trail */
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .content-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            padding: 20px;
+            box-sizing: border-box;
+            pointer-events: none; /* Allows clicks to go through to canvas unless on a specific element */
+        }
+
+        /* New Poem Container Styles */
+        #poem-container {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 40px;
+            max-width: 90%;
+        }
+
+        #poem-container p {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1rem, 3.5vw, 1.6rem); /* Responsive font size */
+            line-height: 1.6;
+            margin: 0.5em 0;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(180, 150, 255, 0.4);
+            opacity: 0; /* Initially hidden */
+            animation-fill-mode: forwards; /* Stay visible after animation */
+        }
+        
+        /* Animation Keyframes */
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Applying staggered animation to each line of the poem */
+        #poem-container p {
+            transform: translateY(20px);
+            /* animation: fadeIn 1.2s ease-out forwards; -- REMOVED base animation */
+        }
+
+        /* NEW CLASS to be added by JS */
+        .start-poem-animation {
+             animation: fadeIn 1.2s ease-out forwards;
+        }
+
+        #poem-container p:nth-child(1).start-poem-animation { animation-delay: 0.5s; }
+        #poem-container p:nth-child(2).start-poem-animation { animation-delay: 2s; }
+        #poem-container p:nth-child(3).start-poem-animation { animation-delay: 3.5s; }
+        #poem-container p:nth-child(4).start-poem-animation { animation-delay: 5s; }
+        #poem-container p:nth-child(5).start-poem-animation { animation-delay: 6.5s; }
+        #poem-container p:nth-child(6).start-poem-animation { animation-delay: 8s; }
+        #poem-container p:nth-child(7).start-poem-animation { animation-delay: 9.5s; }
+        #poem-container p:nth-child(8).start-poem-animation { animation-delay: 11s; }
+        #poem-container p.birthday-greeting.start-poem-animation { 
+            animation-delay: 12.5s; 
+            font-weight: 700;
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            color: #e9d5ff;
+            margin-top: 25px;
+        }
+        #poem-container p.final-wish.start-poem-animation { 
+            animation-delay: 13.5s; 
+            font-style: italic;
+        }
+
+        /* New Pulse Animation for the button */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px rgba(142, 45, 226, 0.7), 0 0 25px rgba(74, 0, 224, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(142, 45, 226, 1), 0 0 45px rgba(74, 0, 224, 0.9); }
+            100% { box-shadow: 0 0 15px rgba(142, 45, 226, 0.7), 0 0 25px rgba(74, 0, 224, 0.5); }
+        }
+
+
+        #wishButton {
+            pointer-events: all; /* Make button clickable */
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            color: #fff;
+            background: linear-gradient(45deg, #4a00e0, #8e2de2);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer; /* Custom cursor trail is visual, keep pointer for UX */
+            box-shadow: 0 0 15px rgba(142, 45, 226, 0.7), 0 0 25px rgba(74, 0, 224, 0.5);
+            transition: all 0.3s ease;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 1px;
+            opacity: 0;
+            /* animation: fadeIn 1.2s ease-out 15s forwards, pulse 2.5s ease-in-out infinite 16.5s; -- REMOVED base animation */
+            transform: translateY(20px);
+        }
+        
+        /* NEW CLASS to be added by JS */
+        #wishButton.start-button-animation {
+            animation: fadeIn 1.2s ease-out 15s forwards, pulse 2.5s ease-in-out infinite 16.5s;
+        }
+
+
+        #wishButton:hover {
+            transform: scale(1.05) translateY(0);
+            box-shadow: 0 0 25px rgba(142, 45, 226, 1), 0 0 40px rgba(74, 0, 224, 0.8);
+            animation-play-state: paused; /* Pause pulsing on hover for a smoother scale effect */
+        }
+        
+        #wishButton:not(:hover) {
+            animation-play-state: running; /* Resume animation when not hovering */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            pointer-events: all; /* Modals should be interactive */
+            cursor: default; /* Show default cursor over modals */
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #8e2de2;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            color: #fff;
+            animation: modalFadeIn 0.5s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-content h2 {
+            font-family: 'Playfair Display', serif;
+            margin-top: 0;
+            color: #e0e0e0;
+        }
+
+        #wishTextArea {
+            width: 100%;
+            height: 120px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            background-color: #0f0c29;
+            border: 1px solid #4a00e0;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            padding: 10px;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            resize: none;
+        }
+        
+        #wishTextArea:focus {
+            outline: none;
+            border-color: #8e2de2;
+            box-shadow: 0 0 10px rgba(142, 45, 226, 0.5);
+        }
+
+        #saveWishButton {
+             padding: 12px 30px;
+            font-size: 1rem;
+            color: #fff;
+            background: linear-gradient(45deg, #4a00e0, #8e2de2);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        #saveWishButton:hover {
+             box-shadow: 0 0 15px rgba(142, 45, 226, 0.8);
+        }
+
+        #confirmationModal .modal-content p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 150px;
+            z-index: 10;
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            pointer-events: all;
+        }
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* --- New Overlay Styles --- */
+        #enterOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            cursor: pointer;
+            transition: opacity 0.5s ease-out; 
+            opacity: 1;
+        }
+
+        #enterButton {
+            pointer-events: all;
+            padding: 18px 40px;
+            font-size: 1.5rem;
+            color: #fff;
+            background: linear-gradient(45deg, #4a00e0, #8e2de2);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(142, 45, 226, 0.7), 0 0 25px rgba(74, 0, 224, 0.5);
+            transition: all 0.3s ease;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 1px;
+            animation: pulse 2.5s ease-in-out infinite; /* Re-use existing pulse */
+        }
+
+        #enterButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(142, 45, 226, 1), 0 0 40px rgba(74, 0, 224, 0.8);
+            animation-play-state: paused;
+        }
+        /* --- End Overlay Styles --- */
+
+    </style>
+</head>
+<body>
+
+    <!-- New "Enter" Overlay -->
+    <div id="enterOverlay">
+        <button id="enterButton">Ready</button>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="birthdayAudio" src="Perfect.mp3" loop style="display: none;" preload="auto"></audio>
+
+    <canvas id="starCanvas"></canvas>
+    
+    <div class="content-container">
+        <div id="poem-container">
+            <p>May all your wishes, whispered or grand,</p>
+            <p>Find their way to bloom within your hand.</p>
+            <p>May your laughter echo, a joyful, sunlit sound,</p>
+            <p>And magic moments blossom all around.</p>
+            <p>May your smile be a beacon, warm and true,</p>
+            <p>A gentle light in everything you do.</p>
+            <p>May simple comforts feel profound and sweet,</p>
+            <p>And serendipity guide your happy feet.</p>
+            <p class="birthday-greeting">Happy Birthday!</p>
+            <p class="final-wish">May this new chapter be your brightest yet, a story woven with love and moments you'll never forget.</p>
+        </div>
+
+         <a href="Main.html" class="back-btn"> Back</a>
+
+        <button id="wishButton">Make a Wish</button>
+    </div>
+
+    <!-- Wish Input Modal -->
+    <div id="wishModal" class="modal">
+        <div class="modal-content">
+            <h2>Write Down Your Wish</h2>
+            <textarea id="wishTextArea" placeholder="What is your heart's desire..."></textarea>
+            <button id="saveWishButton">Save My Wish</button>
+        </div>
+    </div>
+
+    <!-- Confirmation Message Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <p>I will try my best to fulfil it.</p>
+        </div>
+    </div>
+
+    
+    <!-- Hidden form for submitting the wish -->
+    <form id="wishForm" method="POST" target="_blank" style="display: none;">
+        <input type="hidden" name="wish" id="hiddenWishInput">
+        <input type="hidden" name="_subject" value="A New Birthday Wish Has Been Made!">
+        <!-- This field redirects the user to a simple "thank you" page after submission in the new tab -->
+        <input type="hidden" name="_next" value="https://formsubmit.co/thanks">
+    </form>
+
+
+    <script>
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let stars = [];
+        let shootingStars = [];
+        let particles = [];
+        const numStars = 200;
+        const mouse = { x: null, y: null };
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        // --- NEW: Particle class for mouse trail ---
+        class Particle {
+            constructor() {
+                this.x = mouse.x;
+                this.y = mouse.y;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.color = 'rgba(142, 45, 226, 0.8)';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // --- MODIFIED: Star class for twinkling effect ---
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speed = Math.random() * 0.5 + 0.1; // Slower falling speed
+                this.opacity = 0.5 + Math.random() * 0.5;
+                this.twinkleFactor = Math.random() * 2 * Math.PI;
+                this.twinkleSpeed = 0.01 + Math.random() * 0.04;
+            }
+            draw() {
+                const currentOpacity = Math.abs(Math.sin(this.twinkleFactor) * this.opacity);
+                ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            update() {
+                this.y += this.speed;
+                this.twinkleFactor += this.twinkleSpeed;
+                if (this.y > canvas.height) {
+                    this.y = 0 - this.size;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+        }
+
+        // --- NEW: Shooting Star class ---
+        class ShootingStar {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = 0;
+                this.len = (Math.random() * 80) + 10;
+                this.speed = (Math.random() * 10) + 6;
+                this.size = (Math.random() * 1) + 1;
+                this.waitTime = new Date().getTime() + (Math.random() * 3000) + 500;
+                this.active = false;
+            }
+            update() {
+                if (!this.active) {
+                    if (new Date().getTime() > this.waitTime) {
+                        this.active = true;
+                    }
+                } else {
+                    this.x += this.speed;
+                    this.y += this.speed;
+                    if (this.x > canvas.width + 300 || this.y > canvas.height + 300) {
+                        this.reset();
+                    }
+                }
+            }
+            draw() {
+                if (this.active) {
+                    const gradient = ctx.createLinearGradient(this.x, this.y, this.x - this.len, this.y - this.len);
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = this.size;
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(this.x - this.len, this.y - this.len);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function init() {
+            stars = [];
+            shootingStars = [];
+            for (let i = 0; i < numStars; i++) {
+                stars.push(new Star());
+            }
+            for (let i = 0; i < 3; i++) {
+                 shootingStars.push(new ShootingStar());
+            }
+        }
+
+        function handleParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].size <= 0.2) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        function animate() {
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#0f0c29');
+            gradient.addColorStop(0.5, '#302b63');
+            gradient.addColorStop(1, '#24243e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach(star => {
+                star.draw();
+                star.update();
+            });
+            
+            shootingStars.forEach(star => {
+                star.draw();
+                star.update();
+            });
+
+            handleParticles();
+
+            requestAnimationFrame(animate);
+        }
+
+        // --- AUDIO FIX START ---
+        // Get audio elements
+        const birthdayAudio = document.getElementById('birthdayAudio');
+        const enterOverlay = document.getElementById('enterOverlay');
+        const enterButton = document.getElementById('enterButton');
+        const poemLines = document.querySelectorAll('#poem-container p');
+        const wishButton = document.getElementById('wishButton'); // Get wishButton here
+
+        // Function to play audio, to be called on first user interaction
+        function beginExperience() {
+            // 1. Play Audio
+            if (birthdayAudio && birthdayAudio.paused) {
+                birthdayAudio.play().catch(error => {
+                    // Log error if play fails
+                    console.log("Audio playback failed. User interaction is required.", error);
+                });
+            }
+
+            // 2. Hide Overlay (with fade)
+            enterOverlay.style.opacity = '0';
+            setTimeout(() => {
+                enterOverlay.style.display = 'none';
+            }, 500); // Match transition duration
+
+            // 3. Start Animations
+            poemLines.forEach(line => {
+                line.classList.add('start-poem-animation');
+            });
+            wishButton.classList.add('start-button-animation');
+            
+            // 4. Remove this listener
+            enterButton.removeEventListener('click', beginExperience);
+            enterButton.removeEventListener('touchstart', beginExperience);
+        }
+
+        // Listen for the first click or tap on the enter button
+        enterButton.addEventListener('click', beginExperience);
+        enterButton.addEventListener('touchstart', beginExperience);
+        // --- AUDIO FIX END ---
+
+
+        // Event Listeners and Modal Logic
+        // const wishButton = document.getElementById('wishButton'); // Already declared above
+        const saveWishButton = document.getElementById('saveWishButton');
+        const wishModal = document.getElementById('wishModal');
+        const confirmationModal = document.getElementById('confirmationModal');
+        const wishTextArea = document.getElementById('wishTextArea');
+        const hiddenWishForm = document.getElementById('wishForm');
+        const hiddenWishInput = document.getElementById('hiddenWishInput');
+
+        wishButton.addEventListener('click', () => {
+            // startMusic(); // Removed this call
+            wishModal.style.display = 'flex';
+        });
+
+        saveWishButton.addEventListener('click', () => {
+            const wishText = wishTextArea.value.trim();
+            if (wishText) {
+                const yourEmail = "banerjeeshubham00@gmail.com";
+                hiddenWishForm.action = `https://formsubmit.co/${yourEmail}`;
+                hiddenWishInput.value = wishText;
+                hiddenWishForm.submit();
+                wishModal.style.display = 'none';
+                wishTextArea.value = '';
+                confirmationModal.style.display = 'flex';
+                setTimeout(() => {
+                    confirmationModal.style.display = 'none';
+                }, 4000);
+            } else {
+                wishTextArea.style.borderColor = 'red';
+                setTimeout(() => { wishTextArea.style.borderColor = '#4a00e0'; }, 2000);
+            }
+        });
+        
+        window.addEventListener('click', (event) => {
+            if (event.target === wishModal) {
+                wishModal.style.display = 'none';
+            }
+            if (event.target === confirmationModal) {
+                confirmationModal.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            init();
+        });
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+            // Create a few particles for a denser trail
+            for (let i = 0; i < 2; i++) {
+                particles.push(new Particle());
+            }
+        });
+        
+        // Disable mouse trail on touch devices
+        window.addEventListener('touchstart', (event) => {
+            // Make sure we're not touching the enter button
+            if (event.target !== enterButton) {
+                 window.removeEventListener('mousemove', null);
+            }
+        });
+
+
+        setCanvasSize();
+        init();
+        animate();
+    </script>
+</body>
+</html>
+

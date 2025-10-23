@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Birthday Wish</title>
+    
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;700&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- jQuery Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #2D3748; /* text-gray-800 */
+            background-color: #0B1018;
+            overflow: hidden; /* Prevent scrollbars from animated background */
+        }
+
+        /* --- New Animated Eye Background --- */
+        #eye-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(ellipse at center, #164e63 0%, #083344 40%, #082f49 70%, #0c1523 100%);
+            animation: pulse-bg 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse-bg {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        #iris-mover {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.2s ease-out;
+        }
+
+        #iris-lines-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1px;
+            height: 1px;
+            animation: rotate-iris 120s linear infinite;
+        }
+
+        .iris-line {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 2px;
+            width: 200vmax; /* Ensure it covers the whole screen */
+            background: linear-gradient(to right, transparent, #22d3ee, #0e7490, transparent);
+            transform-origin: 0% 50%;
+            opacity: 0.2;
+        }
+
+        @keyframes rotate-iris {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        #pupil {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 20vmin;
+            height: 20vmin;
+            background: #0B1018;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 50px 25px #0B1018;
+            z-index: -1;
+            transition: transform 0.2s ease-out; /* Smooth movement */
+        }
+        
+        .twinkling {
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            z-index: 0;
+            background: transparent url(https://www.script-tutorials.com/demos/360/images/twinkling.png) repeat top center;
+            animation:move-twink-back 200s linear infinite;
+        }
+
+        @keyframes move-twink-back{
+            from {background-position:0 0;}
+            to {background-position:-10000px 5000px;}
+        }
+        /* --- End Background --- */
+
+
+        .font-cursive {
+            font-family: 'Great Vibes', cursive;
+        }
+        #typewriter-target {
+            font-family: 'Source Code Pro', monospace;
+        }
+        .cursor {
+            display: inline-block;
+            animation: blink 0.7s steps(2, start) infinite;
+            background-color: #22d3ee; /* cyan-400 */
+            width: 10px;
+            height: 1.2rem;
+            margin-left: 4px;
+            vertical-align: middle;
+            border-radius: 2px;
+        }
+        @keyframes blink {
+            to { visibility: hidden; }
+        }
+
+        @keyframes moving-light {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* --- New RGB Border Effect --- */
+        /* This is the outer container with the animated gradient */
+        .card-border {
+            position: relative;
+            padding: 3px; /* This controls the thickness of the border */
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            background: conic-gradient(
+                from 180deg at 50% 50%,
+                #ff8a80,  /* Red */
+                #ffd180, /* Yellow */
+                #a2ff7d, /* Green */
+                #7dffea, /* Cyan */
+                #80d8ff, /* Blue */
+                #b388ff, /* Purple */
+                #ff8a80  /* Loop back to Red */
+            );
+            animation: moving-light 3s linear infinite;
+        }
+
+        /* This is the inner card content with the dark background */
+        .card-content {
+            background: rgba(12, 21, 35, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: calc(1.5rem - 3px); /* Slightly smaller radius to fit inside */
+            color: #F9FAFB; /* text-gray-50 */
+        }
+        /* --- End RGB Border Effect --- */
+        
+        /* Entrance Animations - Bouncy! */
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        .animate-bounce-in {
+            animation: bounceIn 0.6s ease-out forwards;
+        }
+        
+        /* Button styles */
+        @keyframes button-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        .answer-btn {
+            background-image: linear-gradient(to right, #06b6d4 0%, #0e7490 51%, #0891b2 100%);
+            background-size: 200% auto;
+            color: white;
+            transition: all 0.4s ease-out;
+            animation: button-pulse 2s infinite ease-in-out;
+        }
+        .answer-btn:hover {
+            background-position: right center;
+            transform: scale(1.1) !important;
+            box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
+            animation-play-state: paused;
+        }
+
+        .back-btn {
+            color: #a5f3fc; 
+            border: 2px solid #22d3ee;
+        }
+        .back-btn:hover {
+            background-color: #22d3ee;
+            color: #0B1018;
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    
+    <!-- ADDED: Audio element for the background song -->
+    <audio id="background-song" src="Eyes.mp3" loop></audio>
+
+    <div id="eye-background">
+        <div id="iris-mover">
+            <div id="iris-lines-container"></div>
+        </div>
+    </div>
+    <div class="twinkling"></div>
+    <div id="pupil"></div>
+
+    <!-- Modal for the interactive questions -->
+    <div id="question-modal" class="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50 p-4">
+        <div id="modal-content-wrapper" class="card-border max-w-lg w-full opacity-0">
+            <div class="card-content">
+                 <div id="modal-inner-content" class="text-center p-8">
+                      <!-- Question content will be injected here by jQuery -->
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content (Initially Hidden) -->
+    <div id="main-content" class="card-border max-w-3xl w-full text-center opacity-0" style="display:none;">
+        <div class="card-content">
+            <div class="p-6 md:p-8">
+                <!-- Image at the top -->
+                <img src="The Eyes.png" 
+                     alt="A Universe In Your Eyes" 
+                     class="rounded-xl mb-6 w-full object-cover shadow-lg border-2 border-cyan-400/50">
+
+                <!-- Typewriter Container -->
+                <div id="type-container">
+                    <h1 class="font-cursive text-5xl md:text-7xl font-bold mb-6 text-cyan-300">Your Eyes...</h1>
+                    <div id="typewriter-target" class="text-sm md:text-lg leading-relaxed text-left text-gray-200">
+                         <p>Your eyes make every path beautiful and meaningful.</p>
+                         <p class="mt-4">Your eyes erase all distance and bring hearts closer.</p>
+                         <p class="mt-4">Your eyes make my heartbeat faster.</p>
+                         <p class="mt-4">Your eyes embrace me tenderly, like a dream beneath your eyelids.</p>
+                         <p class="mt-4">Your eyes heal my pain like a soothing balm on wounds.</p>
+                         <p class="mt-4">Your eyes are as gentle and pure as dew on flowers.</p>
+                         <p class="mt-4">The whole world feels lost and enchanted by your eyes.</p>
+                         <p class="mt-4">Your eyes touch hearts deeply and make them melt with emotion.</p>
+                         <p class="mt-4">Even the stars shy away before the beauty of your eyes.</p>
+                         <p class="mt-4">Your eyes shine brighter than the stars; they hold the warmth and power of light itself.</p>
+                         <p class="mt-4">Your eyes conceal the pain you carry, but they still shine with hope and positivity.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <a href="main.html" class="back-btn inline-block font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
+                        &larr; Go Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Self-invoking function to encapsulate the jQuery plugin
+    (function($) {
+        $.fn.typewriter = function() {
+            this.each(function() {
+                var $ele = $(this), str = $ele.html(), progress = 0;
+                $ele.html('');
+                var timer = setInterval(function() {
+                    var current = str.substr(progress, 1);
+                    if (current == '<') {
+                        progress = str.indexOf('>', progress) + 1;
+                    } else { progress++; }
+                    var content = str.substring(0, progress);
+                    $ele.html(content + '<span class="cursor"></span>');
+                    if (progress >= str.length) {
+                        clearInterval(timer);
+                        $ele.html(str.replace('<span class="cursor"></span>', ''));
+                    }
+                }, 50);
+            });
+            return this;
+        };
+    })(jQuery);
+
+    // --- Interactive Questions Logic ---
+    const interactiveQuestions = [
+        { question: "I feel like I’ve seen you somewhere before...", options: ["Yes", "Where?"] },
+        { question: "Wait, are you the one we pray to every day? Because you look divine", options: ["Kuch bhi", "Jata"] },
+        { question: "Do you know? Every time we talk, I just want to learn more about you.", options: ["Continue"] },
+        { question: "There’s something I’ve noticed about you... do you want to know", options: ["What?", "Yes"] },
+        { question: "Black hole is the second strongest gravitational pull in the universe. First is still your eyes", options: ["Kuch bhi"] },
+        { question: "Do you realize how much eyes can say without a single word?", options: ["Yes", "No"] }
+    ];
+    let currentQuestionIndex = 0;
+
+    function displayQuestionInModal() {
+        const qData = interactiveQuestions[currentQuestionIndex];
+        const innerModal = $('#modal-inner-content');
+        
+        const questionHtml = `
+            <div class="question-content">
+                <p class="text-2xl md:text-3xl font-bold text-cyan-300 mb-8">${qData.question}</p>
+                <div class="flex flex-col sm:flex-row justify-center flex-wrap gap-4">
+                    ${qData.options.map(opt => `<button class="answer-btn font-bold py-3 px-8 rounded-full shadow-lg w-full sm:w-auto">${opt}</button>`).join('')}
+                </div>
+            </div>
+        `;
+        
+        innerModal.html(questionHtml);
+    }
+    
+    function triggerConfetti() {
+        var duration = 5 * 1000;
+        var animationEnd = Date.now() + duration;
+        var colors = ['#22d3ee', '#0e7490', '#a5f3fc', '#FFFFFF'];
+
+        (function frame() {
+            if (Date.now() > animationEnd) return;
+            confetti({
+                particleCount: 2,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: colors
+            });
+            confetti({
+                particleCount: 2,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: colors
+            });
+            requestAnimationFrame(frame);
+        }());
+    }
+
+    $(document).ready(function() {
+        // --- Create Iris Lines ---
+        function createIris() {
+            const container = $('#iris-lines-container');
+            const numLines = 180;
+            for (let i = 0; i < numLines; i++) {
+                let line = $('<div class="iris-line"></div>');
+                line.css({
+                    'transform': `rotate(${ (360 / numLines) * i }deg)`,
+                    'opacity': Math.random() * 0.15 + 0.05 // Random opacity for texture
+                });
+                container.append(line);
+            }
+        }
+        createIris();
+
+        // --- Make Eye Background Moveable ---
+        $(document).on('mousemove', function(e) {
+            let windowWidth = $(window).width();
+            let windowHeight = $(window).height();
+
+            // Calculate mouse position from center of screen
+            let mouseX = e.clientX - (windowWidth / 2);
+            let mouseY = e.clientY - (windowHeight / 2);
+
+            // Define movement intensity (lower number = more movement)
+            let irisMoveFactor = 40;
+            let pupilMoveFactor = 20;
+
+            // Calculate the new positions
+            let irisX = mouseX / irisMoveFactor;
+            let irisY = mouseY / irisMoveFactor;
+            let pupilX = mouseX / pupilMoveFactor;
+            let pupilY = mouseY / pupilMoveFactor;
+
+            $('#iris-mover').css({
+                'transform': `translate(calc(-50% + ${irisX}px), calc(-50% + ${irisY}px))`
+            });
+
+            $('#pupil').css({
+                'transform': `translate(calc(-50% + ${pupilX}px), calc(-50% + ${pupilY}px))`
+            });
+        });
+
+        // --- Start Question Flow ---
+        displayQuestionInModal();
+        $('#modal-content-wrapper').addClass('animate-bounce-in').removeClass('opacity-0');
+
+        // Handle clicking an answer button in the modal
+        $('#question-modal').on('click', '.answer-btn', function() {
+            const wrapper = $('#modal-content-wrapper');
+            wrapper.removeClass('animate-bounce-in').addClass('opacity-0');
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < interactiveQuestions.length) {
+                    displayQuestionInModal();
+                    wrapper.removeClass('opacity-0').addClass('animate-bounce-in');
+                } else {
+                    $('#question-modal').fadeOut(500, function() {
+                        $(this).remove();
+                        triggerConfetti();
+                        $('#main-content').css('display', 'block').addClass('animate-bounce-in').removeClass('opacity-0');
+                        $('#typewriter-target').typewriter();
+                        
+                        // ADDED: Play the background song
+                        $('#background-song')[0].play();
+                    });
+                }
+            }, 400); // Wait for fade out
+        });
+    });
+</script>
+
+</body>
+</html>
