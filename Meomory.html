@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Memories</title>
+
+    <!-- External Libraries & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* --- Animations --- */
+        @keyframes backgroundPan {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* --- Base & Body Styles --- */
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: backgroundPan 20s ease infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
+            overflow: hidden;
+            color: #fff;
+            gap: 1.5rem; /* Ensures space between items */
+        }
+
+        /* --- Main Container --- */
+        .main-container {
+            width: 100%;
+            flex: 1; /* Allows this container to grow and fill space */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 1s ease-out forwards;
+            position: relative;
+        }
+
+        /* --- 3D Carousel Styles --- */
+        .carousel-container {
+            width: 300px;
+            height: 450px;
+            position: relative;
+            perspective: 1000px;
+            cursor: grab;
+        }
+        .carousel-container:active {
+            cursor: grabbing;
+        }
+
+
+        .scene {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease-in-out; /* SMOOTHER ANIMATION */
+        }
+
+        .memory-card {
+            position: absolute;
+            width: 280px;
+            height: 420px;
+            left: 10px;
+            top: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.5s ease, box-shadow 0.5s ease, opacity 0.5s ease;
+            opacity: 0.7;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Standard syntax */
+            /* UI FIX: Prevents rendering glitches on transformed elements */
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .memory-card.is-active {
+            box-shadow: 0 0 40px rgba(236, 72, 153, 0.4);
+            opacity: 1;
+        }
+
+        .memory-card .image-container {
+            width: 100%;
+            height: 65%;
+            overflow: hidden;
+        }
+
+        .memory-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none; /* Prevents image drag interference */
+        }
+
+        .memory-card .caption {
+            text-align: center;
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* UI FIX: This promotes the caption to its own layer, fixing text rendering bugs in 3D space. */
+            transform: translateZ(2px);
+            -webkit-transform-style: flat;
+            transform-style: flat;
+        }
+
+        .memory-card .caption h1 {
+            font-family: 'Pacifico', cursive;
+            color: #f0abfc;
+            font-size: 2rem;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(240, 171, 252, 0.5);
+        }
+
+        .memory-card .caption p {
+            font-family: 'Inter', sans-serif;
+            color: #d1d5db;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            line-height: 1.5;
+        }
+
+        /* --- NEW Footer Controls Bar --- */
+        .footer-controls {
+            width: 100%;
+            max-width: 320px; /* Constrain width */
+            padding: 0.5rem;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9999px; /* Pill shape */
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            animation: fadeIn 1s ease-out 0.5s forwards;
+            opacity: 0;
+            flex-shrink: 0; /* Prevent the footer from shrinking */
+        }
+
+        .control-btn {
+            background: transparent;
+            border: none;
+            border-radius: 9999px;
+            color: #f0abfc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: #ec4899;
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.4);
+        }
+
+        .back-link {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+
+        .diary-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .diary-controls button {
+            width: 45px;
+            height: 45px;
+            font-size: 1rem;
+        }
+        
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 640px) {
+            .carousel-container {
+                width: 240px;
+                height: 380px;
+            }
+            .memory-card {
+                width: 220px;
+                height: 350px;
+            }
+             .memory-card .caption h1 {
+                font-size: 1.75rem;
+            }
+             .memory-card .caption p {
+                font-size: 0.8rem;
+            }
+            .footer-controls {
+                max-width: 280px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Music -->
+    <!-- Note: Browser policies may prevent autoplay until the user interacts with the page. -->
+    <audio id="background-song" autoplay loop style="display:none;">
+        <source src="Prem_KI_Nayiya.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="main-container">
+        <div class="carousel-container" id="carousel-container">
+            <div class="scene" id="scene">
+                <!-- Memory cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-controls">
+        <a href="Main.html" class="back-link control-btn">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <div class="diary-controls">
+            <button onclick="rotateCarousel('prev')" aria-label="Previous" class="control-btn"><i class="fas fa-arrow-left"></i></button>
+            <button onclick="rotateCarousel('next')" aria-label="Next" class="control-btn"><i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set background music volume
+            const backgroundSong = document.getElementById('background-song');
+            if (backgroundSong) {
+                backgroundSong.volume = 0.3; // Adjust volume from 0.0 (mute) to 1.0 (full)
+            }
+
+            const memories = [
+                { img: "Main_White.png", alt: "Cherished Moment", title: "Cherished Moment", text: "A beautiful memory that brings joy and laughter." },
+                { img: "Durga%20Puja.jpg", alt: "Unforgettable Time", title: "Unforgettable Time", text: "Durga Puja moments filled with happiness." },
+                { img: "marathon.jpg", alt: "Good Times", title: "Good Times", text: "Achievements and fun during the marathon." },
+                { img: "Nature.png", alt: "Nature Escape", title: "Nature's Embrace", text: "Sunny days and laughter in the hills." },
+                { img: "Event.png", alt: "Special Event", title: "Event Highlight", text: "A memorable event at the Auditorium." },
+                { img: "traditional1.png", alt: "Traditional Attire", title: "Traditional Grace", text: "Joy and tradition shining through. 🌸✨" },
+                { img: "House.jpg", alt: "Aesthetic Photo", title: "Aesthetic Grace", text: "Between the glow of streetlights and old walls, she found herself. 🏙️" },
+                { img: "Diwali.jpg", alt: "Festival of Lights", title: "Diwali Glow", text: "Shining bright during the festival of lights." }
+            ];
+
+            const scene = document.getElementById('scene');
+            const carouselContainer = document.getElementById('carousel-container');
+            const cardCount = memories.length;
+            // MOBILE FRIENDLY: Dynamically adjust radius for better viewing on small screens
+            const radius = window.innerWidth <= 640 ? 220 : 350;
+            let cards = [];
+            let currentAngle = 0;
+            let activeIndex = 0;
+
+            function setupCarousel() {
+                memories.forEach((memory, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'memory-card';
+                    
+                    const angle = (360 / cardCount) * index;
+                    
+                    // Position cards in a circle
+                    card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+                    
+                    card.innerHTML = `
+                        <div class="image-container">
+                            <img src="${memory.img}" alt="${memory.alt}" onerror="this.onerror=null;this.src='https://placehold.co/600x800/333333/FFFFFF?text=Image+Not+Found';">
+                        </div>
+                        <div class="caption">
+                            <h1>${memory.title}</h1>
+                            <p>${memory.text}</p>
+                        </div>
+                    `;
+                    scene.appendChild(card);
+                    cards.push(card);
+                });
+                updateActiveCard();
+            }
+
+            function updateActiveCard() {
+                cards.forEach((card, index) => {
+                    card.classList.toggle('is-active', index === activeIndex);
+                });
+            }
+
+            window.rotateCarousel = (direction) => {
+                const angleIncrement = 360 / cardCount;
+                if (direction === 'next') {
+                    currentAngle -= angleIncrement;
+                    activeIndex = (activeIndex + 1) % cardCount;
+                } else {
+                    currentAngle += angleIncrement;
+                    activeIndex = (activeIndex - 1 + cardCount) % cardCount;
+                }
+
+                scene.style.transform = `rotateY(${currentAngle}deg)`;
+                updateActiveCard();
+            };
+
+            // --- NEW: Swipe Functionality ---
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            function handleSwipe() {
+                const swipeDistance = touchEndX - touchStartX;
+                const swipeThreshold = 50; // Minimum distance for a swipe
+
+                if (swipeDistance < -swipeThreshold) {
+                    // Swiped left
+                    rotateCarousel('next');
+                } else if (swipeDistance > swipeThreshold) {
+                    // Swiped right
+                    rotateCarousel('prev');
+                }
+            }
+
+            carouselContainer.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            carouselContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+
+            setupCarousel();
+        });
+    </script>
+</body>
+
+</html>
+
