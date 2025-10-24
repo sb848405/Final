@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>An Unforgettable Birthday for a Goddess!</title>
-
-    <!-- External Libraries & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
 
     <style>
-        /* --- Custom Properties for Theming --- */
         :root {
             --bg-dark: #0d0221;
             --bg-light: #fef1f9;
@@ -40,8 +37,6 @@
             --accent-blue: #7dd3fc;
             --accent-gold: #fbbf24;
         }
-
-        /* --- Base & Body Styles --- */
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
@@ -50,8 +45,6 @@
             background-color: var(--bg-dark);
             transition: var(--theme-transition);
         }
-        
-        /* --- Pre-loader --- */
         #loader {
             position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease, visibility 0.8s ease;
         }
@@ -59,13 +52,9 @@
         .spinner {
             width: 60px; height: 60px; border: 5px solid rgba(255, 255, 255, 0.2); border-top-color: var(--accent-pink); border-radius: 50%; animation: spin 1s ease-in-out infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* --- Canvas Background --- */
+        @keyframes spin { to { transform: rotate(360deg); 
         #animationCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         .content-wrapper { position: relative; z-index: 1; }
-        
-        /* --- UI Controls --- */
         .ui-controls { position: fixed; top: 1rem; right: 1rem; z-index: 1100; display: flex; gap: 0.5rem; }
         .control-btn {
             cursor: pointer; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 9999px; padding: 0.5rem; transition: all 0.3s ease;
@@ -77,8 +66,6 @@
         #moon-icon, .light-mode #sun-icon, #music-on-icon { display: none; }
         .light-mode #moon-icon, .music-playing #music-on-icon, #music-off-icon { display: block; }
         .music-playing #music-off-icon { display: none; }
-        
-        /* --- Typography & Header --- */
         #main-header { transition: transform 0.2s ease-out; perspective: 1000px; }
         .font-pacifico {
             font-family: 'Pacifico', cursive;
@@ -106,8 +93,6 @@
         #knife { position: absolute; width: 150px; height: 30px; opacity: 0; transform-origin: bottom right; pointer-events: none; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3)); }
         #cake-container.cutting #knife { animation: cut-animation 3s ease-in-out forwards; }
         @keyframes cut-animation { 0% { opacity: 1; transform: translate(-150px, -200px) rotate(20deg); } 30% { opacity: 1; transform: translate(-10px, -60px) rotate(-35deg); } 60% { opacity: 1; transform: translate(-10px, -50px) rotate(-35deg); } 100% { opacity: 0; transform: translate(150px, -200px) rotate(-50deg); } }
-
-        /* --- Action Buttons Grid --- */
         .bday-btn {
             background-color: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -131,11 +116,7 @@
         .bday-btn:nth-child(2) { animation-delay: 0.5s; } .bday-btn:nth-child(3) { animation-delay: 1s; }
         .bday-btn:nth-child(4) { animation-delay: 1.5s; } .bday-btn:nth-child(5) { animation-delay: 0.2s; }
         .bday-btn:nth-child(6) { animation-delay: 0.7s; } .bday-btn:nth-child(7) { animation-delay: 1.2s; } .bday-btn:nth-child(8) { animation-delay: 0.4s; }
-
-        /* --- Countdown --- */
         #countdown { font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
-
-        /* --- Modals --- */
         .modal { position: fixed; inset: 0; background: rgba(10, 5, 20, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; padding: 1rem; transition: opacity 0.5s ease; opacity: 0; pointer-events: none; z-index: 1050; }
         .light-mode .modal { background: rgba(255, 255, 255, 0.6); }
         .modal-content {
@@ -149,13 +130,9 @@
         .light-mode .modal-title { color: var(--accent-pink); }
     </style>
 </head>
-
-<body class="antialiased">
-    
+<body class="antialiased">    
     <audio id="background-music" loop src="hbd2.mp3"></audio>
-
     <div id="loader"><div class="spinner"></div></div>
-
     <div class="ui-controls">
         <button id="music-toggle" class="control-btn" title="Toggle Music">
             <svg id="music-on-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
@@ -166,15 +143,12 @@
             <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
         </button>
     </div>
-
     <canvas id="animationCanvas"></canvas>
     <div class="content-wrapper min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 text-center overflow-hidden">
-        
         <header id="main-header" class="my-8">
             <h1 class="font-pacifico text-5xl md:text-7xl lg:text-8xl">Happy Birthday Juhi!</h1>
             <p class="mt-4 text-xl md:text-2xl opacity-80 font-light tracking-wider">Wishing you a magical day, fit for a goddess!</p>
         </header>
-        
         <section id="cake-section" class="my-8 flex flex-col items-center">
             <div id="cake-container" class="relative w-72 h-72 mx-auto filter drop-shadow-2xl cursor-pointer" title="Click to cut the cake!">
                 <div id="knife"><svg viewBox="0 0 150 30" preserveAspectRatio="none"><path d="M 150 15 C 150 23.28 143.28 30 135 30 L 20 30 Q 5 30 5 15 Q 5 0 20 0 L 135 0 C 143.28 0 150 6.72 150 15 Z" fill="#9ca3af"/><path d="M 120 2 L 15 2 Q 2 2 2 15 Q 2 28 15 28 L 120 28 Z" fill="#e5e7eb"/><path d="M 15 5 L 115 5" stroke="#f8fafc" stroke-width="2"/></svg></div>
@@ -182,7 +156,6 @@
             </div>
             <button id="cutCakeBtn" class="mt-8 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 focus:ring-4 focus:ring-pink-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>Cut the Cake!</button>
         </section>
-
         <section class="my-10 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full max-w-4xl">
             <a href="Meomory.html" class="bday-btn"><span class="text-3xl mb-2">📸</span> Memories<span class="shine"></span></a>
             <a href="special.html" class="bday-btn"><span class="text-3xl mb-2">💖</span> Why You're Special<span class="shine"></span></a>
@@ -193,11 +166,8 @@
             <a href="Birthday_Notes.html" class="bday-btn"><span class="text-3xl mb-2">💌</span> Birthday Notes<span class="shine"></span></a>
             <a href="Surprise.html" class="bday-btn"><span class="text-3xl mb-2">🎁</span> Last Surprise<span class="shine"></span></a>
         </section>
-        
         <section id="countdown" class="bg-white/10 backdrop-blur-md rounded-2xl shadow-xl p-6 my-8 w-full max-w-4xl border border-white/20"><h2 class="text-2xl font-bold mb-4 opacity-90 font-light">Every end is a new beginning... Countdown to your  birthday!</h2><div id="timer" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-lg"></div></section>
     </div>
-
-    <!-- Modal for the cake cutting -->
     <div id="giftCardModal" class="modal"><div class="modal-content text-center"><button class="modal-close-btn">&times;</button><div class="w-24 h-24 mb-4 mx-auto animate-bounce"><svg viewBox="0 0 64 64" fill="none" class="w-full h-full"><rect x="8" y="24" width="48" height="32" rx="6" fill="#f9a8d4"/><rect x="8" y="24" width="48" height="10" rx="3" fill="#f472b6"/><rect x="30" y="24" width="4" height="32" fill="#fff" /><rect x="8" y="34" width="48" height="4" fill="#fff" /><ellipse cx="20" cy="24" rx="6" ry="10" fill="#f472b6"/><ellipse cx="44" cy="24" rx="6" ry="10" fill="#f472b6"/></svg></div><h2 class="font-pacifico text-3xl text-pink-500 mb-2">Happywala Birthday!</h2><p class="text-lg text-gray-700 mb-4">Wishing you a day filled with peace, laughter, and all the little things that make you smile. & today i am promissing I will always be there for you, no matter what storms may come.
                              I’ll always try to be your solution when things get hard,
                              your cure when life feels heavy,
@@ -208,27 +178,17 @@
                              your laughter when you need a little joy,
                              I wish I could take away all your bad times and give you the best moments I have.
                              and your reminder that you are stronger than you think. 
-
                             You deserve all the happiness, love, and warmth this world can give.
                            . .🌼</p><button class="modal-close-btn-bottom mt-4 bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-6 rounded-full shadow-lg">Close</button></div></div>
-    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- Pre-loader ---
             const loader = document.getElementById('loader');
             window.addEventListener('load', () => { loader.classList.add('hidden'); });
-
-            // --- Sound & Music Engine ---
-            // Synth for UI sound effects
             const synth = new Tone.PolySynth(Tone.Synth, { oscillator: { type: 'fmsine' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.8 } }).toDestination();
             const playSound = (note, duration) => { try { if (Tone.context.state !== 'running') { Tone.context.resume(); } synth.triggerAttackRelease(note, duration); } catch (e) { console.error("Sound error:", e); } };
-            
-            // Background music control
             const musicToggle = document.getElementById('music-toggle');
             const backgroundMusic = document.getElementById('background-music');
-            
             musicToggle.addEventListener('click', () => {
-                // Tone.start() is still needed to enable audio context for UI sounds.
                 Tone.start();
                 if (backgroundMusic.paused) {
                     backgroundMusic.play().catch(error => console.error("Audio playback failed:", error));
@@ -238,8 +198,6 @@
                     musicToggle.classList.remove('music-playing');
                 }
             });
-            
-            // --- Theme Toggle ---
             const themeToggle = document.getElementById('theme-toggle');
             const body = document.body;
             const currentTheme = localStorage.getItem('theme');
@@ -249,8 +207,6 @@
                 localStorage.setItem('theme', body.classList.contains('light-mode') ? 'light-mode' : '');
                 playSound('G5', '8n');
             });
-            
-            // --- Mouse Parallax for Header ---
             const header = document.getElementById('main-header');
             window.addEventListener('mousemove', (e) => {
                 const { clientX, clientY } = e;
@@ -258,12 +214,9 @@
                 const moveY = (clientY - window.innerHeight / 2) * -0.02;
                 header.style.transform = `translate(${moveX}px, ${moveY}px) rotateX(${-moveY * 0.5}deg) rotateY(${moveX * 0.5}deg)`;
             });
-            
-            // --- Cake Cutting & Gift Modal Logic ---
             const cutCakeBtn = document.getElementById('cutCakeBtn');
             const cakeContainer = document.getElementById('cake-container');
             const giftCardModal = document.getElementById('giftCardModal');
-            
             function handleCutCake() {
                 if (cakeContainer.classList.contains('cutting')) return;
                 playSound('E4', '4n');
@@ -275,19 +228,15 @@
             }
             cutCakeBtn.addEventListener('click', handleCutCake);
             cakeContainer.addEventListener('click', handleCutCake);
-
-            // --- Countdown Timer Logic ---
             const timerEl = document.getElementById('timer');
             function updatePageCountdown() {
                 const now = new Date();
                 let nextBirthday = new Date(now.getFullYear(), 11, 25);
                 if (now > nextBirthday) nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
-                
                 if (now.getMonth() === 11 && now.getDate() === 25) {
                     timerEl.innerHTML = `<div class="col-span-full p-3 bg-white/20 rounded-lg"><span class="text-3xl font-bold">🎉 Happy Birthday! Enjoy Your Day! 🎉</span></div>`;
                     return;
                 }
-
                 const diff = nextBirthday - now;
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -299,8 +248,6 @@
             }
             setInterval(updatePageCountdown, 1000);
             updatePageCountdown();
-
-            // --- General Modal Logic ---
             function openModal(modal) {
                 if(modal) modal.classList.add('show');
                  playSound('C5', '8n');
@@ -316,8 +263,6 @@
                 modal.querySelector('.modal-close-btn')?.addEventListener('click', () => closeModal(modal));
                 modal.querySelector('.modal-close-btn-bottom')?.addEventListener('click', () => closeModal(modal));
             });
-
-            // --- Canvas Animation ---
             const canvas = document.getElementById('animationCanvas');
             const ctx = canvas.getContext('2d');
             let confettiPieces = [];
@@ -325,9 +270,7 @@
             let auroraTime = 0;
             const confettiColors = ['#f72585', '#7209b7', '#4361ee', '#ffdd00', '#fff'];
             const auroraColors = [[260, 90, 60], [320, 90, 70], [220, 90, 70]];
-
             function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-            
             class Confetti {
                 constructor(x, y) {
                     this.x = x; this.y = y;
@@ -360,7 +303,6 @@
                     ctx.restore();
                 }
             }
-            
             class Star {
                 constructor() {
                     this.x = Math.random() * canvas.width;
@@ -384,7 +326,6 @@
                     ctx.fill();
                 }
             }
-            
             function drawAurora() {
                 ctx.globalCompositeOperation = 'lighter';
                 auroraTime += 0.005;
@@ -405,7 +346,6 @@
                 }
                 ctx.globalCompositeOperation = 'source-over';
             }
-
             function triggerConfettiBurst() {
                 const burstX = window.innerWidth / 2;
                 const burstY = window.innerHeight / 2;
@@ -413,30 +353,25 @@
                     confettiPieces.push(new Confetti(burstX, burstY));
                 }
             }
-
             function initStars() {
                 for(let i=0; i<150; i++) {
                     stars.push(new Star());
                 }
             }
-            
             function handleAnimations() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
                 if (!document.body.classList.contains('light-mode')) {
                     drawAurora();
                 }
-                
                 stars.forEach(s => { s.update(); s.draw(); });
 
                 confettiPieces = confettiPieces.filter(c => c.opacity > 0);
                 confettiPieces.forEach(c => { c.update(); c.draw(); });
             }
-
             window.addEventListener('resize', resizeCanvas);
             resizeCanvas();
             initStars();
-
             (function animate() {
                 handleAnimations();
                 requestAnimationFrame(animate);
@@ -445,3 +380,4 @@
     </script>
 </body>
 </html>
+
